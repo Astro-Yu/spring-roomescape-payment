@@ -1,5 +1,7 @@
 package roomescape.unit.theme.service;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 import java.util.List;
@@ -12,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.ThemeName;
+import roomescape.theme.dto.request.ThemeCreateRequest;
 import roomescape.theme.infrastructure.ThemeRepository;
 import roomescape.theme.service.ThemeService;
 
@@ -42,5 +45,19 @@ public class ThemeServiceTest {
         soft.assertThat(foundThemes).hasSize(3);
         soft.assertThat(foundThemes.getFirst().getId()).isEqualTo(1L);
         soft.assertAll();
+    }
+
+    @Test
+    void createTheme() {
+        // given
+        ThemeCreateRequest request = new ThemeCreateRequest("이름1", "설명1", "섬네일1");
+        Theme theme = new Theme(1L, new ThemeName("이름1"), "설명1", "섬네일1");
+        given(themeRepository.save(any())).willReturn(theme);
+
+        // when
+        Theme savedTheme = themeService.createTheme(request);
+        
+        // then
+        assertThat(savedTheme.getId()).isEqualTo(1L);
     }
 }

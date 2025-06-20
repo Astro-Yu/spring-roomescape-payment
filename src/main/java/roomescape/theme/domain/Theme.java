@@ -14,7 +14,7 @@ public class Theme {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private Long id;
-    
+
     @Embedded
     @Column(nullable = false)
     private ThemeName name;
@@ -33,6 +33,10 @@ public class Theme {
     }
 
     public Theme() {
+    }
 
+    public static Theme createWithoutId(final String name, final String description, final String thumbnail) {
+        ThemeName themeName = new ThemeName(name);
+        return new Theme(null, themeName, description, thumbnail);
     }
 }
