@@ -60,11 +60,28 @@ public class ThemeApiTest {
                 .then().log().all()
                 .statusCode(201)
                 .extract().as(ThemeResponse.class);
-        
+
         List<Theme> themes = themeRepository.findAll();
         SoftAssertions soft = new SoftAssertions();
         soft.assertThat(themes).hasSize(5);
         soft.assertThat(response.id()).isEqualTo(5L);
+        soft.assertAll();
+    }
+
+    @Test
+    @DisplayName("테마를 삭제합니다.")
+    void deleteTheme() {
+        // when & then
+        RestAssured.given().log().all()
+                .when().delete("/api/themes/1")
+                .then().log().all()
+                .statusCode(204);
+
+        List<Theme> themes = themeRepository.findAll();
+        SoftAssertions soft = new SoftAssertions();
+        soft.assertThat(themes).hasSize(3);
+        soft.assertThat(themes.stream()
+                .anyMatch(theme -> theme.getId().equals(1L))).isFalse();
         soft.assertAll();
     }
 }

@@ -1,8 +1,11 @@
 package roomescape.unit.theme.service;
 
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.util.List;
 import org.assertj.core.api.SoftAssertions;
@@ -15,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.ThemeName;
 import roomescape.theme.dto.request.ThemeCreateRequest;
+import roomescape.theme.exception.ThemeNotFoundException;
 import roomescape.theme.infrastructure.ThemeRepository;
 import roomescape.theme.service.ThemeService;
 
@@ -48,6 +52,7 @@ public class ThemeServiceTest {
     }
 
     @Test
+    @DisplayName("테마를 생성합니다.")
     void createTheme() {
         // given
         ThemeCreateRequest request = new ThemeCreateRequest("이름1", "설명1", "섬네일1");
@@ -56,8 +61,31 @@ public class ThemeServiceTest {
 
         // when
         Theme savedTheme = themeService.createTheme(request);
-        
+
         // then
         assertThat(savedTheme.getId()).isEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("테마를 삭제합니다.")
+    void deleteTheme() {
+        // given
+        given(themeRepository.existsById(any())).willReturn(true);
+        // when
+        themeService.deleteTheme(1L);
+        // then
+        verify(themeRepository, times(1)).deleteById(1L);
+    }
+
+    @Test
+    @DisplayName("없는 테마 삭제 시, 예외가 발생합니다.")
+    void deleteThemeException() {
+        // given
+        given(themeRepository.existsById(any())).willReturn(false);
+
+        // when & then
+        assertThatCode(() -> themeService.deleteTheme(any()))
+                .isInstanceOf(ThemeNotFoundException.class)
+                .hasMessage("존재하지 않는 테마입니다.");
     }
 }
