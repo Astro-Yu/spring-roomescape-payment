@@ -33,6 +33,10 @@ public class ReservationTime {
     protected ReservationTime() {
     }
 
+    public static ReservationTime createWithoutId(LocalTime startAt) {
+        return new ReservationTime(null, startAt);
+    }
+
     private void validateTime(LocalTime time) {
         if (isNotValidTime(time)) {
             throw new InvalidReservationTimeException();
