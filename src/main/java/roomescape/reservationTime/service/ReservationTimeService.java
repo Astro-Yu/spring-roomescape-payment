@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.reservationTime.domain.ReservationTime;
 import roomescape.reservationTime.dto.request.ReservationTimeCreateRequest;
 import roomescape.reservationTime.exception.DuplicatedReservationTimeException;
+import roomescape.reservationTime.exception.ReservationTimeNotFoundException;
 import roomescape.reservationTime.infrastructure.ReservationTimeRepository;
 
 @Service
@@ -33,5 +34,12 @@ public class ReservationTimeService {
         if (reservationTimeRepository.existsByStartAt(startAt)) {
             throw new DuplicatedReservationTimeException();
         }
+    }
+
+    public void deleteReservationTime(final Long id) {
+        if (!reservationTimeRepository.existsById(id)) {
+            throw new ReservationTimeNotFoundException();
+        }
+        reservationTimeRepository.deleteById(id);
     }
 }

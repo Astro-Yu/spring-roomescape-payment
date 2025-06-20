@@ -1,8 +1,11 @@
 package roomescape.unit.member.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.time.LocalTime;
 import java.util.List;
@@ -14,6 +17,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import roomescape.reservationTime.domain.ReservationTime;
 import roomescape.reservationTime.dto.request.ReservationTimeCreateRequest;
+import roomescape.reservationTime.exception.DuplicatedReservationTimeException;
+import roomescape.reservationTime.exception.ReservationTimeNotFoundException;
 import roomescape.reservationTime.infrastructure.ReservationTimeRepository;
 import roomescape.reservationTime.service.ReservationTimeService;
 
@@ -53,8 +58,6 @@ public class ReservationTimeServiceTest {
 
         // when & then
         ReservationTime savedTime = reservationTimeService.createReservationTime(request);
-
-        // then
         assertThat(savedTime.getId()).isEqualTo(1L);
     }
 
@@ -63,13 +66,33 @@ public class ReservationTimeServiceTest {
     void createReservationTimesWithException() {
         // given
         ReservationTimeCreateRequest request = new ReservationTimeCreateRequest(LocalTime.of(10, 0));
-        ReservationTime time = new ReservationTime(1L, LocalTime.of(10, 0));
-        given(reservationTimeRepository.save(any())).willReturn(time);
+        given(reservationTimeRepository.existsByStartAt(any())).willReturn(true);
 
-        // when & then
-        ReservationTime savedTime = reservationTimeService.createReservationTime(request);
+        //when & then
+        assertThatCode(() -> reservationTimeService.createReservationTime(request))
+                .isInstanceOf(DuplicatedReservationTimeException.class)
+                .hasMessage("중복된 예약 시간은 생성 불가능합니다.");
+    }
 
+    @Test
+    @DisplayName("id로 예약 시간을 삭제합니다.")
+    void deleteReservationTime() {
+        // given
+        given(reservationTimeRepository.existsById(any())).willReturn(true);
+        // when
+        reservationTimeService.deleteReservationTime(1L);
         // then
-        assertThat(savedTime.getId()).isEqualTo(1L);
+        verify(reservationTimeRepository, times(1)).deleteById(1L);
+    }
+
+    @Test
+    @DisplayName("id에 대한 예약시간이 존재하지 않을 시 예외가 발생합니다.")
+    void deleteReservationTimeException() {
+        // given
+        given(reservationTimeRepository.existsById(any())).willReturn(false);
+        // when & then
+        assertThatCode(() -> reservationTimeService.deleteReservationTime(1L))
+                .isInstanceOf(ReservationTimeNotFoundException.class)
+                .hasMessage("해당 예약 시간이 존재하지 않습니다.");
     }
 }

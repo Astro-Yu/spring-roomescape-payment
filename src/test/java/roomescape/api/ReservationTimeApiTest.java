@@ -71,4 +71,22 @@ public class ReservationTimeApiTest {
         soft.assertThat(response.startAt()).isEqualTo(LocalTime.of(21, 0));
         soft.assertAll();
     }
+
+    @Test
+    @DisplayName("예약 시간을 삭제합니다.")
+    void deleteReservationTime() {
+        // when
+        RestAssured.given().log().all()
+                .when().delete("api/reservation-times/1")
+                .then().log().all()
+                .statusCode(204);
+        // then
+        List<ReservationTime> reservationTimes = reservationTimeRepository.findAll();
+        SoftAssertions soft = new SoftAssertions();
+        soft.assertThat(reservationTimes).hasSize(10);
+        soft.assertThat(reservationTimes.stream()
+                        .anyMatch(reservationTime -> reservationTime.getId().equals(1L)))
+                .isFalse();
+        soft.assertAll();
+    }
 }
