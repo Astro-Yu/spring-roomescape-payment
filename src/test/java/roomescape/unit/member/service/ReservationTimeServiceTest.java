@@ -36,13 +36,13 @@ public class ReservationTimeServiceTest {
 
     @Test
     @DisplayName("모든 예약 시간을 조회합니다.")
-    void getReservationTimes() {
+    void findAllReservationTimes() {
         // given
         List<ReservationTime> times = List.of(reservationTime1, reservationTime2, reservationTime3);
         given(reservationTimeRepository.findAll()).willReturn(times);
 
         // when
-        List<ReservationTime> foundTimes = reservationTimeService.getReservationTimes();
+        List<ReservationTime> foundTimes = reservationTimeService.findAllReservationTimes();
 
         // then
         assertThat(foundTimes).hasSize(3);

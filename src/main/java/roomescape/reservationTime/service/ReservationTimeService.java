@@ -20,7 +20,7 @@ public class ReservationTimeService {
     }
 
     @Transactional(readOnly = true)
-    public List<ReservationTime> getReservationTimes() {
+    public List<ReservationTime> findAllReservationTimes() {
         return reservationTimeRepository.findAll();
     }
 

@@ -27,7 +27,7 @@ public class ReservationTimeController {
 
     @GetMapping
     public List<ReservationTimeResponse> getAllReservationTimes() {
-        List<ReservationTime> reservationTimes = reservationTimeService.getReservationTimes();
+        List<ReservationTime> reservationTimes = reservationTimeService.findAllReservationTimes();
 
         return reservationTimes.stream().
                 map(ReservationTimeResponse::from)
