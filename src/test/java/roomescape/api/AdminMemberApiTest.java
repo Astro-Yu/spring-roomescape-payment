@@ -1,0 +1,40 @@
+package roomescape.api;
+
+import io.restassured.RestAssured;
+import java.util.List;
+import org.assertj.core.api.SoftAssertions;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
+import roomescape.member.dto.response.MemberResponse;
+import roomescape.member.infrastructure.MemberRepository;
+
+@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@ActiveProfiles("test")
+@Sql("/sql/Member.sql")
+public class AdminMemberApiTest {
+
+    @Autowired
+    private MemberRepository memberRepository;
+
+    @Test
+    void getAllMembers() {
+
+        // when & then
+        List<MemberResponse> responses = RestAssured.given().log().all()
+                .when().get("api/admin/members")
+                .then().log().all()
+                .statusCode(200)
+                .extract().jsonPath().getList(".", MemberResponse.class);
+
+        SoftAssertions soft = new SoftAssertions();
+        soft.assertThat(responses).hasSize(2);
+        soft.assertThat(responses.getFirst().id()).isEqualTo(1L);
+        soft.assertAll();
+    }
+}
