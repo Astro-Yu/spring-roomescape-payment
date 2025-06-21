@@ -2,13 +2,15 @@ package roomescape.member.dto.response;
 
 import roomescape.member.domain.Member;
 
-public record MemberResponse(Long id, String name, String email, String role) {
+public record MemberResponse(Long id, String name, String email, String role, boolean deleted) {
 
     public static MemberResponse from(Member member) {
         return new MemberResponse(
                 member.getId(),
                 member.getName().getName(),
                 member.getCredentials().getEmail(),
-                member.getRole().toString());
+                member.getRole().toString(),
+                member.isDeleted()
+        );
     }
 }

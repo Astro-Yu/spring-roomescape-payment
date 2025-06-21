@@ -13,8 +13,15 @@ public class AdminMemberService {
         this.memberRepository = memberRepository;
     }
 
-
     public List<Member> findAllMembers() {
         return memberRepository.findAll();
+    }
+
+    public List<Member> findActiveMember() {
+        return memberRepository.findByDeleted(false);
+    }
+
+    public List<Member> findDeletedMember() {
+        return memberRepository.findByDeleted(true);
     }
 }

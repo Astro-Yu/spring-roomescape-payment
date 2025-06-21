@@ -3,6 +3,7 @@ package roomescape.api;
 import io.restassured.RestAssured;
 import java.util.List;
 import org.assertj.core.api.SoftAssertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,11 +24,43 @@ public class AdminMemberApiTest {
     private MemberRepository memberRepository;
 
     @Test
+    @DisplayName("모든 멤버 조회")
     void getAllMembers() {
-
         // when & then
         List<MemberResponse> responses = RestAssured.given().log().all()
                 .when().get("api/admin/members")
+                .then().log().all()
+                .statusCode(200)
+                .extract().jsonPath().getList(".", MemberResponse.class);
+
+        SoftAssertions soft = new SoftAssertions();
+        soft.assertThat(responses).hasSize(4);
+        soft.assertThat(responses.getFirst().id()).isEqualTo(1L);
+        soft.assertAll();
+    }
+
+    @Test
+    @DisplayName("삭제된 멤버 조회")
+    void getAllDeletedMembers() {
+        // when & then
+        List<MemberResponse> responses = RestAssured.given().log().all()
+                .when().get("api/admin/members?status=deleted")
+                .then().log().all()
+                .statusCode(200)
+                .extract().jsonPath().getList(".", MemberResponse.class);
+
+        SoftAssertions soft = new SoftAssertions();
+        soft.assertThat(responses).hasSize(2);
+        soft.assertThat(responses.getFirst().id()).isEqualTo(3L);
+        soft.assertAll();
+    }
+
+    @Test
+    @DisplayName("존재하는 멤버 조회")
+    void getAllActiveMembers() {
+        // when & then
+        List<MemberResponse> responses = RestAssured.given().log().all()
+                .when().get("api/admin/members?status=active")
                 .then().log().all()
                 .statusCode(200)
                 .extract().jsonPath().getList(".", MemberResponse.class);
