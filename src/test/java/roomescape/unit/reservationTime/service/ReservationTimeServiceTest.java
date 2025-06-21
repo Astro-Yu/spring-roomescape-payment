@@ -1,4 +1,4 @@
-package roomescape.unit.member.service;
+package roomescape.unit.reservationTime.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;

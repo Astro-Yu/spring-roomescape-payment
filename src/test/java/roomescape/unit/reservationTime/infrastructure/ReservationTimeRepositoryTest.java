@@ -1,4 +1,4 @@
-package roomescape.unit.member.infrastructure;
+package roomescape.unit.reservationTime.infrastructure;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

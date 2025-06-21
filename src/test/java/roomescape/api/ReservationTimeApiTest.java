@@ -32,14 +32,13 @@ public class ReservationTimeApiTest {
     @DisplayName("모든 예약시간을 조회합니다.")
     void findAllReservationTimes() {
 
-        // when
+        // when & then
         List<ReservationTimeResponse> responses = RestAssured.given().log().all()
                 .when().get("api/reservation-times")
                 .then().log().all()
                 .statusCode(200)
                 .extract().jsonPath().getList(".", ReservationTimeResponse.class);
-
-        //then
+        
         SoftAssertions soft = new SoftAssertions();
         soft.assertThat(responses).hasSize(11);
         soft.assertThat(responses.getFirst().id()).isEqualTo(1L);
