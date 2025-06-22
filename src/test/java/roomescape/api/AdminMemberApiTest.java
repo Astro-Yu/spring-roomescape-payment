@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
+import roomescape.member.domain.Member;
 import roomescape.member.dto.response.MemberResponse;
 import roomescape.member.infrastructure.MemberRepository;
 
@@ -68,6 +69,27 @@ public class AdminMemberApiTest {
         SoftAssertions soft = new SoftAssertions();
         soft.assertThat(responses).hasSize(2);
         soft.assertThat(responses.getFirst().id()).isEqualTo(1L);
+        soft.assertAll();
+    }
+
+    @Test
+    @DisplayName("관리자가 특정 회원을 id로 삭제")
+    void deleteMember() {
+        // when & then
+        RestAssured.given().log().all()
+                .when().delete("api/admin/members/1")
+                .then().log().all()
+                .statusCode(204);
+
+        List<Member> members = memberRepository.findAll();
+        Member deletedMember = members.stream()
+                .filter(member -> member.getId().equals(1L))
+                .findFirst()
+                .get();
+
+        SoftAssertions soft = new SoftAssertions();
+        soft.assertThat(members).hasSize(4);
+        soft.assertThat(deletedMember.isDeleted()).isTrue();
         soft.assertAll();
     }
 }

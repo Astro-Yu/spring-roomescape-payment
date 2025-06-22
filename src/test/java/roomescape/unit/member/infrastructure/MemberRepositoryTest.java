@@ -10,7 +10,7 @@ import org.springframework.test.context.jdbc.Sql;
 import roomescape.member.domain.Member;
 import roomescape.member.infrastructure.MemberRepository;
 
-@DataJpaTest
+@DataJpaTest()
 @Sql("/sql/Member.sql")
 public class MemberRepositoryTest {
 

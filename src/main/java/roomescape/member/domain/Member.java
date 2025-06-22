@@ -46,6 +46,10 @@ public class Member {
     public Member() {
     }
 
+    public void delete() {
+        this.deleted = true;
+    }
+
     @Override
     public boolean equals(final Object o) {
         if (o == null || getClass() != o.getClass()) {
