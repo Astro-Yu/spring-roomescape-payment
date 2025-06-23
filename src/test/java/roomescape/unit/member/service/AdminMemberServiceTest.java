@@ -32,10 +32,10 @@ public class AdminMemberServiceTest {
     @InjectMocks
     private AdminMemberService adminMemberService;
 
-    private Member member1 = new Member(1L, new Name("이름1"), new Credentials("이메일1", "비번1"), Role.ADMIN, true);
-    private Member member2 = new Member(2L, new Name("이름2"), new Credentials("이메일2", "비번2"), Role.USER, true);
-    private Member member3 = new Member(3L, new Name("이름3"), new Credentials("이메일3", "비번3"), Role.USER, false);
-    private Member member4 = new Member(4L, new Name("이름4"), new Credentials("이메일4", "비번4"), Role.USER, false);
+    private Member member1 = new Member(1L, new Name("이름1"), new Credentials("이메일1", "비번1111111"), Role.ADMIN, true);
+    private Member member2 = new Member(2L, new Name("이름2"), new Credentials("이메일2", "비번2222222"), Role.USER, true);
+    private Member member3 = new Member(3L, new Name("이름3"), new Credentials("이메일3", "비번3333333"), Role.USER, false);
+    private Member member4 = new Member(4L, new Name("이름4"), new Credentials("이메일4", "비번4444444"), Role.USER, false);
 
     @Test
     @DisplayName("탈퇴한 모든 멤버 조회")

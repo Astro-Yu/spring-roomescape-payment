@@ -22,7 +22,7 @@ public class AdminMemberController {
         this.adminMemberService = adminMemberService;
     }
 
-    @GetMapping()
+    @GetMapping
     public List<MemberResponse> getAllMembersByStatus(@RequestParam(defaultValue = "all") String status) {
         List<Member> members = adminMemberService.findMembersByStatus(status);
 
