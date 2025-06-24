@@ -85,4 +85,14 @@ public class UserMemberApiTest {
         soft.assertThat(response.email()).isEqualTo("ama@gmail.com");
         soft.assertAll();
     }
+
+    @Test
+    void deleteMyMember() {
+        //when & then
+        RestAssured.given().log().all()
+                .cookie("JSESSIONID", sessionId)
+                .when().delete("/api/members/my")
+                .then().log().all()
+                .statusCode(204);
+    }
 }

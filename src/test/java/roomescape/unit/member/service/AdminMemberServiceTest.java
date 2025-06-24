@@ -1,13 +1,8 @@
 package roomescape.unit.member.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.times;
 
 import java.util.List;
-import java.util.Optional;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,7 +14,6 @@ import roomescape.member.domain.Credentials;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Name;
 import roomescape.member.domain.Role;
-import roomescape.member.exception.MemberNotFoundException;
 import roomescape.member.infrastructure.MemberRepository;
 import roomescape.member.service.AdminMemberService;
 
@@ -69,33 +63,5 @@ public class AdminMemberServiceTest {
         soft.assertThat(members).hasSize(2);
         soft.assertThat(members.getFirst()).isEqualTo(member1);
         soft.assertAll();
-    }
-
-    @Test
-    @DisplayName("id로 특정 회원을 삭제합니다.")
-    void deleteMemberById() {
-        //given
-        given(memberRepository.findById(1L)).willReturn(Optional.of(member1));
-
-        // when
-        adminMemberService.deleteMemberById(1L);
-
-        // then
-        then(memberRepository).should(times(1)).findById(1L);
-        assertThat(member1.isDeleted()).isTrue();
-    }
-
-    @Test
-    @DisplayName("id로 삭제 시도 시, 회원이 없으면 예외가 발생합니다.")
-    void deleteMemberByIdWithException() {
-        //given
-        given(memberRepository.findById(5L)).willReturn(Optional.empty());
-
-        // when & then
-        assertThatCode(() -> adminMemberService.deleteMemberById(5L))
-                .isInstanceOf(MemberNotFoundException.class)
-                .hasMessage("해당 회원을 찾을 수 없습니다.");
-
-        then(memberRepository).should(times(1)).findById(5L);
     }
 }

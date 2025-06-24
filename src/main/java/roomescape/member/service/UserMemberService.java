@@ -1,6 +1,7 @@
 package roomescape.member.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.domain.Credentials;
 import roomescape.member.domain.Member;
 import roomescape.member.dto.request.MemberCreateRequest;
@@ -9,6 +10,7 @@ import roomescape.member.exception.MemberNotFoundException;
 import roomescape.member.infrastructure.MemberRepository;
 
 @Service
+@Transactional
 public class UserMemberService {
 
     private final MemberRepository memberRepository;

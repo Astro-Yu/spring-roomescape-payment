@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.domain.Member;
 import roomescape.member.exception.InvalidMemberStatusException;
-import roomescape.member.exception.MemberNotFoundException;
 import roomescape.member.infrastructure.MemberRepository;
 
 @Service
@@ -29,11 +28,5 @@ public class AdminMemberService {
             return memberRepository.findByDeleted(false);
         }
         throw new InvalidMemberStatusException();
-    }
-
-    public void deleteMemberById(Long id) {
-        Member target = memberRepository.findById(id).orElseThrow(MemberNotFoundException::new);
-
-        target.delete();
     }
 }

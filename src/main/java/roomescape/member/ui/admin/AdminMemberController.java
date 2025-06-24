@@ -11,15 +11,18 @@ import org.springframework.web.bind.annotation.RestController;
 import roomescape.member.domain.Member;
 import roomescape.member.dto.response.MemberResponse;
 import roomescape.member.service.AdminMemberService;
+import roomescape.member.service.MemberService;
 
 @RestController
 @RequestMapping("/api/admin/members")
 public class AdminMemberController {
 
     private final AdminMemberService adminMemberService;
+    private final MemberService memberService;
 
-    public AdminMemberController(final AdminMemberService adminMemberService) {
+    public AdminMemberController(final AdminMemberService adminMemberService, final MemberService memberService) {
         this.adminMemberService = adminMemberService;
+        this.memberService = memberService;
     }
 
     @GetMapping
@@ -33,7 +36,7 @@ public class AdminMemberController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteMember(@PathVariable Long id) {
-        adminMemberService.deleteMemberById(id);
+        memberService.deleteMemberById(id);
 
         return ResponseEntity.noContent().build();
     }
