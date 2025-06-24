@@ -1,7 +1,8 @@
 package roomescape.config.dto;
 
+import java.io.Serializable;
 import roomescape.member.domain.Name;
 import roomescape.member.domain.Role;
 
-public record SessionMember(Long id, Name name, Role role) {
+public record SessionMember(Long id, Name name, Role role) implements Serializable {
 }

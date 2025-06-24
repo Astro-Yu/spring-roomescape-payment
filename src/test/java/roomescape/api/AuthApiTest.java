@@ -59,14 +59,16 @@ public class AuthApiTest {
         request.put("password", savedMember.getCredentials().getPassword());
 
         // when & then
-        RestAssured.given().log().all()
+        String jsessionId = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .body(request)
                 .when().post("/api/auth/sign-in")
                 .then().log().all()
-                .statusCode(200);
+                .statusCode(200)
+                .extract().cookie("JSESSIONID");
 
         RestAssured.given().log().all()
+                .cookie("JSESSIONID", jsessionId)
                 .when().post("/api/auth/sign-out")
                 .then().log().all()
                 .statusCode(200);

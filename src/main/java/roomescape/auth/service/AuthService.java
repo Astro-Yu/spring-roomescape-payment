@@ -8,6 +8,8 @@ import roomescape.auth.exception.InvalidAuthenticationException;
 import roomescape.config.dto.SessionMember;
 import roomescape.member.domain.Credentials;
 import roomescape.member.domain.Member;
+import roomescape.member.domain.Name;
+import roomescape.member.exception.MemberNotFoundException;
 import roomescape.member.infrastructure.MemberRepository;
 
 @Service
@@ -20,11 +22,22 @@ public class AuthService {
         this.memberRepository = memberRepository;
     }
 
+    public Name getAuthenticatedMemberName(final Long id) {
+        Member member = memberRepository.findById(id)
+                .orElseThrow(MemberNotFoundException::new);
+        return member.getName();
+    }
+
     public void login(final LoginRequest request, final HttpSession session) {
         // 인증 과정
         Credentials credentials = request.toCredentials();
         Member member = memberRepository.findMemberByCredentials(credentials)
                 .orElseThrow(InvalidAuthenticationException::new);
+
+        // 삭제된 멤버인 경우 예외 처리
+        if (member.isDeleted()) {
+            throw new InvalidAuthenticationException();
+        }
 
         // 세션에 저장
         session.setAttribute("LOGIN_MEMBER", new SessionMember(member.getId(), member.getName(), member.getRole()));
