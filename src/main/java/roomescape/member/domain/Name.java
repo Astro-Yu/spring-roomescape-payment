@@ -1,12 +1,13 @@
 package roomescape.member.domain;
 
 import jakarta.persistence.Embeddable;
+import java.io.Serializable;
 import lombok.Getter;
 import roomescape.member.exception.InvalidNameLengthException;
 
 @Embeddable
 @Getter
-public class Name {
+public class Name implements Serializable {
     private static final int MAX_NAME_LENGTH = 10;
 
     private String name;

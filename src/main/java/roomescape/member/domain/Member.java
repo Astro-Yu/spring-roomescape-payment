@@ -46,6 +46,10 @@ public class Member {
     public Member() {
     }
 
+    public static Member createWithoutIdWhenUserSignUp(String name, String email, String password) {
+        return new Member(null, new Name(name), new Credentials(email, password), Role.USER, false);
+    }
+
     public void delete() {
         this.deleted = true;
     }

@@ -10,4 +10,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     List<Member> findByDeleted(boolean deleted);
 
     Optional<Member> findMemberByCredentials(Credentials credentials);
+
+    boolean existsByCredentials_Email(String email);
 }
