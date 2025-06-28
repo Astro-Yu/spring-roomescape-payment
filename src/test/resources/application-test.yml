@@ -8,6 +8,8 @@ spring:
     init:
       mode: always
       data-locations:
+  server:
+    port: 0  # 랜덤 포트 사용
   # h2-console
   h2.console:
     enabled: true

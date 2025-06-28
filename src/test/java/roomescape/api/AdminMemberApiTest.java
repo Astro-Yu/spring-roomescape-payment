@@ -110,7 +110,7 @@ public class AdminMemberApiTest {
                 .filter(member -> member.getId().equals(1L))
                 .findFirst()
                 .get();
-
+        
         SoftAssertions soft = new SoftAssertions();
         soft.assertThat(members).hasSize(4);
         soft.assertThat(deletedMember.isDeleted()).isTrue();

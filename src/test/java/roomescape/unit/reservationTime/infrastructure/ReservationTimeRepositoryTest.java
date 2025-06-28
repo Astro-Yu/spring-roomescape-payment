@@ -8,11 +8,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.jdbc.Sql;
+import roomescape.config.RepositoryTestBase;
 import roomescape.reservationTime.infrastructure.ReservationTimeRepository;
 
 @DataJpaTest
 @Sql(value = "/sql/ReservationTime.sql")
-public class ReservationTimeRepositoryTest {
+public class ReservationTimeRepositoryTest extends RepositoryTestBase {
     @Autowired
     private ReservationTimeRepository reservationTimeRepository;
 
