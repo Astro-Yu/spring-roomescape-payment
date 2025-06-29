@@ -69,7 +69,7 @@ public class ReservationRepositoryTest extends RepositoryTestBase {
 
         ReservationDateTime dateTime = new ReservationDateTime(date, time1);
 
-        Reservation reservation = Reservation.createWithoutId(date, time1, theme1, member1);
+        Reservation reservation = Reservation.createWithoutIdAndPayment(date, time1, theme1, member1);
         reservationRepository.save(reservation);
 
         // when & then
@@ -82,11 +82,11 @@ public class ReservationRepositoryTest extends RepositoryTestBase {
         // given
         LocalDate date1 = LocalDate.of(2025, 5, 5);
 
-        Reservation reservation1 = Reservation.createWithoutId(date1, time1, theme1, member1);
-        Reservation reservation2 = Reservation.createWithoutId(date1, time1, theme2, member1);
+        Reservation reservation1 = Reservation.createWithoutIdAndPayment(date1, time1, theme1, member1);
+        Reservation reservation2 = Reservation.createWithoutIdAndPayment(date1, time1, theme2, member1);
 
-        Reservation reservation3 = Reservation.createWithoutId(date1, time2, theme1, member2);
-        Reservation reservation4 = Reservation.createWithoutId(date1, time2, theme2, member2);
+        Reservation reservation3 = Reservation.createWithoutIdAndPayment(date1, time2, theme1, member2);
+        Reservation reservation4 = Reservation.createWithoutIdAndPayment(date1, time2, theme2, member2);
 
         reservationRepository.save(reservation1);
         reservationRepository.save(reservation2);
