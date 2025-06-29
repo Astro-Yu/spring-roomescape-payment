@@ -7,9 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.domain.Member;
 import roomescape.member.exception.MemberNotFoundException;
 import roomescape.member.infrastructure.MemberRepository;
-import roomescape.payment.domain.Payment;
-import roomescape.payment.dto.request.PaymentRequest;
-import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationDateTime;
 import roomescape.reservation.dto.request.UserReservationCreateRequest;
@@ -31,21 +28,18 @@ public class UserReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
-    private final PaymentService paymentService;
 
     public UserReservationService(final ReservationRepository reservationRepository,
                                   final ReservationTimeRepository reservationTimeRepository,
                                   final ThemeRepository themeRepository,
-                                  final MemberRepository memberRepository, final PaymentService paymentService) {
+                                  final MemberRepository memberRepository) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
-        this.paymentService = paymentService;
     }
 
     public Reservation creaetReservation(final UserReservationCreateRequest request, final Long memberId) {
-        // 보류 상태 예약 생성
         ReservationTime time = reservationTimeRepository.findById(request.timeId())
                 .orElseThrow(ReservationTimeNotFoundException::new);
         Theme theme = themeRepository.findById(request.themeId())
@@ -53,21 +47,12 @@ public class UserReservationService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(MemberNotFoundException::new);
 
-        Reservation reservation = Reservation.createWithoutIdAndPayment(request.date(), time, theme, member);
-
         ReservationDateTime dateTime = new ReservationDateTime(request.date(), time);
 
         validateDuplicateReservation(dateTime, theme);
         validateBeforeOrTodayDate(dateTime);
 
-        PaymentRequest paymentRequest = new PaymentRequest(request.orderId(), request.paymentKey(), request.amount());
-
-        // 결제 시작
-        Payment payment = paymentService.createPayment(paymentRequest);
-
-        // 얘약이랑 결제 합체 (상태도 변경됨)
-        reservation.confirmWithPayment(payment);
-
+        Reservation reservation = Reservation.createWithoutIdAndPayment(request.date(), time, theme, member);
         return reservationRepository.save(reservation);
     }
 

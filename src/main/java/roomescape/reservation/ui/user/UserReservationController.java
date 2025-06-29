@@ -13,6 +13,7 @@ import roomescape.config.resolver.Login;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.dto.request.UserReservationCreateRequest;
 import roomescape.reservation.dto.response.ReservationResponse;
+import roomescape.reservation.service.ReservationFacade;
 import roomescape.reservation.service.UserReservationService;
 
 @Controller
@@ -20,9 +21,12 @@ import roomescape.reservation.service.UserReservationService;
 public class UserReservationController {
 
     private final UserReservationService userReservationService;
+    private final ReservationFacade reservationFacade;
 
-    public UserReservationController(final UserReservationService userReservationService) {
+    public UserReservationController(final UserReservationService userReservationService,
+                                     final ReservationFacade reservationFacade) {
         this.userReservationService = userReservationService;
+        this.reservationFacade = reservationFacade;
     }
 
     @GetMapping("/my")
@@ -36,7 +40,7 @@ public class UserReservationController {
     @PostMapping
     public ResponseEntity<ReservationResponse> createMyReservation(@RequestBody UserReservationCreateRequest request,
                                                                    @Login SessionMember sessionMember) {
-        Reservation reservation = userReservationService.creaetReservation(request, sessionMember.id());
+        Reservation reservation = reservationFacade.createReservationWithPayment(request, sessionMember.id());
         ReservationResponse response = ReservationResponse.from(reservation);
         return ResponseEntity.created(URI.create("/api/reservations/" + response.id())).body(response);
     }

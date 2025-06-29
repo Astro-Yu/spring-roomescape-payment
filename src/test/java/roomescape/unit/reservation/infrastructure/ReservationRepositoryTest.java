@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
 import java.util.List;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -98,5 +99,34 @@ public class ReservationRepositoryTest extends RepositoryTestBase {
 
         // then
         assertThat(reservations).hasSize(2);
+    }
+
+    @Test
+    @DisplayName("회원 ID로 예약들을 검색합니다.")
+    void findReservationByMemberId() {
+        // given
+        LocalDate date1 = LocalDate.of(2025, 5, 5);
+
+        Reservation reservation1 = Reservation.createWithoutIdAndPayment(date1, time1, theme1, member1);
+        Reservation reservation2 = Reservation.createWithoutIdAndPayment(date1, time1, theme2, member1);
+
+        Reservation reservation3 = Reservation.createWithoutIdAndPayment(date1, time2, theme1, member2);
+        Reservation reservation4 = Reservation.createWithoutIdAndPayment(date1, time2, theme2, member2);
+
+        reservationRepository.save(reservation1);
+        reservationRepository.save(reservation2);
+        reservationRepository.save(reservation3);
+        reservationRepository.save(reservation4);
+
+        // when
+        List<Reservation> reservations = reservationRepository.findAllByMemberId(member1.getId());
+
+        // then
+        SoftAssertions soft = new SoftAssertions();
+        soft.assertThat(reservations).hasSize(2);
+        soft.assertThat(reservations.stream()
+                        .allMatch(reservation -> reservation.getMember().equals(member1)))
+                .isTrue();
+        soft.assertAll();
     }
 }
