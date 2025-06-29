@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.auth.exception.InvalidAuthorizationException;
 import roomescape.member.domain.Member;
 import roomescape.member.exception.MemberNotFoundException;
 import roomescape.member.infrastructure.MemberRepository;
@@ -12,6 +13,7 @@ import roomescape.reservation.domain.ReservationDateTime;
 import roomescape.reservation.dto.request.UserReservationCreateRequest;
 import roomescape.reservation.exception.DuplicateReservationException;
 import roomescape.reservation.exception.PastOrPresentReservationException;
+import roomescape.reservation.exception.ReservationNotFoundException;
 import roomescape.reservation.infrastructure.ReservationRepository;
 import roomescape.reservationTime.domain.ReservationTime;
 import roomescape.reservationTime.exception.ReservationTimeNotFoundException;
@@ -70,5 +72,26 @@ public class UserReservationService {
 
     public List<Reservation> getMyReservations(Long id) {
         return reservationRepository.findAllByMemberId(id);
+    }
+
+    public void deleteMyReservation(final Long id, final Long memberId) {
+        validateReservationExists(id);
+        validateReservationIsMine(id, memberId);
+        reservationRepository.deleteById(id);
+    }
+
+    private void validateReservationExists(Long id) {
+        if (!reservationRepository.existsById(id)) {
+            throw new ReservationNotFoundException();
+        }
+    }
+
+    private void validateReservationIsMine(final Long id, final Long memberId) {
+        Reservation reservation = reservationRepository.findById(id)
+                .orElseThrow(ReservationNotFoundException::new);
+
+        if (reservation.isNotOwnedBy(memberId)) {
+            throw new InvalidAuthorizationException();
+        }
     }
 }

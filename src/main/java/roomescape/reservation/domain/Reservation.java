@@ -91,4 +91,8 @@ public class Reservation {
     public int hashCode() {
         return Objects.hashCode(id);
     }
+
+    public boolean isNotOwnedBy(Long memberId) {
+        return !member.isSameId(memberId);
+    }
 }

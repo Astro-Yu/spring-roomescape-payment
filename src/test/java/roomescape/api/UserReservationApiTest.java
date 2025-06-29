@@ -19,11 +19,15 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
+import roomescape.member.domain.Member;
 import roomescape.member.infrastructure.MemberRepository;
 import roomescape.payment.dto.response.PaymentResponse;
 import roomescape.payment.infrastructure.PaymentClient;
+import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.infrastructure.ReservationRepository;
+import roomescape.reservationTime.domain.ReservationTime;
 import roomescape.reservationTime.infrastructure.ReservationTimeRepository;
+import roomescape.theme.domain.Theme;
 import roomescape.theme.infrastructure.ThemeRepository;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -95,5 +99,25 @@ public class UserReservationApiTest {
                 .statusCode(201)
                 .body("date", equalTo(date.toString()))
                 .body("memberName", equalTo("리버"));
+    }
+
+    @Test
+    @DisplayName("회원이 자신의 예약을 삭제합니다.")
+    void deleteMyReservation() {
+        // given
+        LocalDate date1 = LocalDate.of(2025, 5, 5);
+        ReservationTime time = reservationTimeRepository.findById(1L).get();
+        Theme theme1 = themeRepository.findById(1L).get();
+        Member member1 = memberRepository.findById(2L).get();
+        Reservation reservation1 = Reservation.createWithoutIdAndPayment(date1, time, theme1, member1);
+
+        Reservation savedReservation = reservationRepository.save(reservation1);
+
+        // when & then
+        RestAssured.given().log().all()
+                .cookie("JSESSIONID", sessionId)
+                .when().delete("/api/reservations/" + savedReservation.getId())
+                .then().log().all()
+                .statusCode(204);
     }
 }

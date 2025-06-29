@@ -54,6 +54,10 @@ public class Member {
         this.deleted = true;
     }
 
+    public boolean isSameId(final Long id) {
+        return id.equals(this.id);
+    }
+
     @Override
     public boolean equals(final Object o) {
         if (o == null || getClass() != o.getClass()) {

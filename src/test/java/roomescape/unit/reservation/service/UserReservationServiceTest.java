@@ -1,10 +1,13 @@
 package roomescape.unit.reservation.service;
 
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,6 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import roomescape.auth.exception.InvalidAuthorizationException;
 import roomescape.member.domain.Credentials;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Name;
@@ -20,6 +24,7 @@ import roomescape.member.infrastructure.MemberRepository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationDateTime;
 import roomescape.reservation.domain.ReservationStatus;
+import roomescape.reservation.exception.ReservationNotFoundException;
 import roomescape.reservation.infrastructure.ReservationRepository;
 import roomescape.reservation.service.UserReservationService;
 import roomescape.reservationTime.domain.ReservationTime;
@@ -71,7 +76,7 @@ public class UserReservationServiceTest {
 
         given(reservationRepository.findAllByMemberId(member1.getId())).willReturn(
                 List.of(reservation1, reservation2, reservation3, reservation4));
-        
+
         // when
         List<Reservation> reservations = userReservationService.getMyReservations(member1.getId());
 
@@ -82,5 +87,34 @@ public class UserReservationServiceTest {
                         .allMatch(reservation -> reservation.getMember().equals(member1)))
                 .isTrue();
         soft.assertAll();
+    }
+
+    @Test
+    @DisplayName("회원이 자신의 예약이 아닌 예약 삭제 시 예외가 발생합니다.")
+    void deleteMyReservationFailWhenNotMyReservation() {
+        // given
+        Member member = new Member(1L, new Name("굿"), new Credentials("이메일", "비밀번호1234"), Role.USER, false);
+        Reservation reservation = new Reservation(null, null, null, member, null, null);
+
+        given(reservationRepository.existsById(any())).willReturn(true);
+        given(reservationRepository.findById(1L)).willReturn(Optional.of(reservation));
+
+        // when & then
+        assertThatCode(() -> userReservationService.deleteMyReservation(1L, 2L))
+                .isInstanceOf(InvalidAuthorizationException.class)
+                .hasMessage("권한이 없습니다.");
+    }
+
+    @Test
+    @DisplayName("회원이 없는 예약 삭제 시, 예외가 발생합니다.")
+    void deleteMyReservationFailWhenNotExist() {
+        // given
+        given(reservationRepository.existsById(any())).willReturn(false);
+
+        // when
+        assertThatCode(() -> userReservationService.deleteMyReservation(1L, 1L))
+                .isInstanceOf(ReservationNotFoundException.class)
+                .hasMessage("해당 예약이 존재하지 않습니다.");
+        // then
     }
 }
