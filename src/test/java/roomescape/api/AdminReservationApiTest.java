@@ -47,7 +47,7 @@ public class AdminReservationApiTest {
 
     @Autowired
     private MemberRepository memberRepository;
-    
+
     private String sessionId;
 
     @BeforeEach
@@ -104,11 +104,11 @@ public class AdminReservationApiTest {
         Member member1 = memberRepository.findById(1L).get();
         Member member2 = memberRepository.findById(2L).get();
 
-        Reservation reservation1 = Reservation.createWithoutId(date1, time, theme1, member1);
-        Reservation reservation2 = Reservation.createWithoutId(date1, time, theme2, member1);
+        Reservation reservation1 = Reservation.createWithoutIdAndPayment(date1, time, theme1, member1);
+        Reservation reservation2 = Reservation.createWithoutIdAndPayment(date1, time, theme2, member1);
 
-        Reservation reservation3 = Reservation.createWithoutId(date1, time, theme1, member2);
-        Reservation reservation4 = Reservation.createWithoutId(date1, time, theme2, member2);
+        Reservation reservation3 = Reservation.createWithoutIdAndPayment(date1, time, theme1, member2);
+        Reservation reservation4 = Reservation.createWithoutIdAndPayment(date1, time, theme2, member2);
 
         reservationRepository.save(reservation1);
         reservationRepository.save(reservation2);
@@ -127,5 +127,31 @@ public class AdminReservationApiTest {
         SoftAssertions soft = new SoftAssertions();
         soft.assertThat(responses).hasSize(1);
         soft.assertThat(responses.getFirst().id()).isEqualTo(2L);
+    }
+
+    @Test
+    @DisplayName("예약을 삭제합니다.")
+    void deleteReservation() {
+        // given
+        LocalDate date1 = LocalDate.of(2025, 5, 5);
+        ReservationTime time = reservationTimeRepository.findById(1L).get();
+        Theme theme1 = themeRepository.findById(1L).get();
+        Member member1 = memberRepository.findById(1L).get();
+        Reservation reservation1 = Reservation.createWithoutIdAndPayment(date1, time, theme1, member1);
+
+        Reservation savedReservation = reservationRepository.save(reservation1);
+
+        // when & then
+        RestAssured.given().log().all()
+                .cookie("JSESSIONID", sessionId)
+                .when().delete("/api/admin/reservations/" + savedReservation.getId())
+                .then().log().all()
+                .statusCode(204);
+
+        List<Reservation> reservations = reservationRepository.findAll();
+        assertThat(
+                reservations.stream()
+                        .filter(reservation -> reservation.equals(savedReservation))
+                        .findAny()).isEmpty();
     }
 }

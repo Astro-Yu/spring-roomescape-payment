@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -21,9 +23,11 @@ import roomescape.member.domain.Role;
 import roomescape.member.infrastructure.MemberRepository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationDateTime;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.dto.request.AdminReservationCreateRequest;
 import roomescape.reservation.exception.DuplicateReservationException;
 import roomescape.reservation.exception.PastOrPresentReservationException;
+import roomescape.reservation.exception.ReservationNotFoundException;
 import roomescape.reservation.infrastructure.ReservationRepository;
 import roomescape.reservation.service.AdminReservationService;
 import roomescape.reservationTime.domain.ReservationTime;
@@ -62,8 +66,9 @@ public class AdminReservationServiceTest {
         given(themeRepository.findById(any())).willReturn(Optional.of(theme));
         given(memberRepository.findById(any())).willReturn(Optional.of(member));
 
-        Reservation reservationWithoutId = Reservation.createWithoutId(date, time, theme, member);
-        Reservation reservation = new Reservation(1L, new ReservationDateTime(date, time), theme, member);
+        Reservation reservationWithoutId = Reservation.createWithoutIdAndPayment(date, time, theme, member);
+        Reservation reservation = new Reservation(1L, new ReservationDateTime(date, time), theme, member, null,
+                ReservationStatus.PAID);
         given(reservationRepository.save(reservationWithoutId)).willReturn(reservation);
 
         AdminReservationCreateRequest request = new AdminReservationCreateRequest(date, 1L, 1L, 1L);
@@ -113,5 +118,28 @@ public class AdminReservationServiceTest {
                 .hasMessage("당일 예약 및 과거 예약은 생성할 수 없습니다.");
     }
 
+    @Test
+    @DisplayName("id로 예약을 삭제합니다.")
+    void deleteReservationSuccess() {
+        // given
+        given(reservationRepository.existsById(any())).willReturn(true);
 
+        // when
+        adminReservationService.deleteReservation(1L);
+
+        // then
+        verify(reservationRepository, times(1)).deleteById(any());
+    }
+
+    @Test
+    @DisplayName("예약이 존재하지 않으면 예외가 발생합니다.")
+    void deleteReservationFail() {
+        // given
+        given(reservationRepository.existsById(any())).willReturn(false);
+
+        // when & then
+        assertThatCode(() -> adminReservationService.deleteReservation(any()))
+                .isInstanceOf(ReservationNotFoundException.class)
+                .hasMessage("해당 예약이 존재하지 않습니다.");
+    }
 }

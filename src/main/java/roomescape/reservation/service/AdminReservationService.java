@@ -12,6 +12,7 @@ import roomescape.reservation.dto.request.AdminReservationCreateRequest;
 import roomescape.reservation.dto.request.ReservationSearchFilter;
 import roomescape.reservation.exception.DuplicateReservationException;
 import roomescape.reservation.exception.PastOrPresentReservationException;
+import roomescape.reservation.exception.ReservationNotFoundException;
 import roomescape.reservation.infrastructure.ReservationRepository;
 import roomescape.reservationTime.domain.ReservationTime;
 import roomescape.reservationTime.exception.ReservationTimeNotFoundException;
@@ -52,7 +53,7 @@ public class AdminReservationService {
         validateDuplicateReservation(dateTime, theme);
         validateBeforeOrTodayDate(dateTime);
 
-        Reservation reservation = Reservation.createWithoutId(request.date(), time, theme, member);
+        Reservation reservation = Reservation.createFreeReservationWithoutId(request.date(), time, theme, member);
 
         return reservationRepository.save(reservation);
     }
@@ -75,5 +76,16 @@ public class AdminReservationService {
                 filter.dateTo(),
                 filter.memberId(),
                 filter.themeId());
+    }
+
+    public void deleteReservation(final Long id) {
+        validateReservationExists(id);
+        reservationRepository.deleteById(id);
+    }
+
+    private void validateReservationExists(Long id) {
+        if (!reservationRepository.existsById(id)) {
+            throw new ReservationNotFoundException();
+        }
     }
 }
